@@ -47,15 +47,15 @@ static inline float cross(float x, float y, Vector3f vertex){
   return edge.cross(vertex).z();
 }
 
-static bool insideTriangle(int x, int y, const Vector3f* _v)
+static bool insideTriangle(float x, float y, const Vector3f* _v)
 {   
     // TODO : Implement this function to check if the point (x, y) is inside the triangle represented by _v[0], _v[1], _v[2]
     float cross_res[3];
     for(int i = 0; i < 3; i++){
       cross_res[i] = cross(x - _v[i].x(), y - _v[i].y(), _v[i] - _v[(i+1)%3]);
     }
-    return (cross_res[0] < 0 && cross_res[1] < 0 && cross_res[2] < 0) || 
-      (cross_res[0] > 0 && cross_res[1] > 0 && cross_res[2] > 0);
+    return (cross_res[0] < 0.0 && cross_res[1] < 0.0 && cross_res[2] < 0.0) || 
+      (cross_res[0] > 0.0 && cross_res[1] > 0.0 && cross_res[2] > 0.0);
 }
 
 static std::tuple<float, float, float> computeBarycentric2D(float x, float y, const Vector3f* v)
@@ -131,16 +131,28 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t) {
     // If so, use the following code to get the interpolated z value.
     for(int x = bound_box[0].x(); x < bound_box[1].x(); x++){
         for(int y = bound_box[0].y(); y < bound_box[1].y(); y++){
-          auto[alpha, beta, gamma] = computeBarycentric2D(x, y, t.v);
-          float w_reciprocal = 1.0/(alpha / v[0].w() + beta / v[1].w() + gamma / v[2].w());
-          float z_interpolated = alpha * v[0].z() / v[0].w() + beta * v[1].z() / v[1].w() + gamma * v[2].z() / v[2].w();
-          z_interpolated *= w_reciprocal;
-          if(insideTriangle(x, y, t.v)){
-            auto ind = (height-1-y)*width + x;
-            if(z_interpolated < depth_buf[ind]){
-              set_pixel(Vector3f(x, y, 0), t.getColor());
-              depth_buf[ind] = z_interpolated;
+          auto ind = get_index(x, y);
+          int cnt = 0;
+          Vector3f color(0, 0, 0);
+          for(int i = 0; i < 4; i++){
+            float xf = x + 0.25 + 0.5 * (float)(i % 2);
+            float yf = y + 0.25 + 0.5 * (float)(i / 2);
+            auto[alpha, beta, gamma] = computeBarycentric2D(xf, yf, t.v);
+            float w_reciprocal = 1.0/(alpha / v[0].w() + beta / v[1].w() + gamma / v[2].w());
+            float z_interpolated = alpha * v[0].z() / v[0].w() + beta * v[1].z() / v[1].w() + gamma * v[2].z() / v[2].w();
+            z_interpolated *= w_reciprocal;
+            if(z_interpolated < depth_buf[ind][i]){
+              if(insideTriangle(xf, yf, t.v)){
+                cnt++;
+                depth_buf[ind][i] = z_interpolated;
+                color_buf[ind][i] = t.getColor();
+              }
             }
+            color += color_buf[ind][i];
+          }
+          if(cnt != 0){
+            color /= 4;
+            set_pixel(Vector3f(x, y, 0), color);
           }
         }
     }
@@ -171,7 +183,12 @@ void rst::rasterizer::clear(rst::Buffers buff)
     }
     if ((buff & rst::Buffers::Depth) == rst::Buffers::Depth)
     {
-        std::fill(depth_buf.begin(), depth_buf.end(), std::numeric_limits<float>::infinity());
+        std::array<float, 4> inf;
+        std::array<Eigen::Vector3f, 4> zero;
+        inf.fill(std::numeric_limits<float>::infinity());
+        zero.fill(Vector3f(0, 0, 0));
+        std::fill(depth_buf.begin(), depth_buf.end(), inf);
+        std::fill(color_buf.begin(), color_buf.end(), zero);
     }
 }
 
@@ -179,6 +196,7 @@ rst::rasterizer::rasterizer(int w, int h) : width(w), height(h)
 {
     frame_buf.resize(w * h);
     depth_buf.resize(w * h);
+    color_buf.resize(w * h);
 }
 
 int rst::rasterizer::get_index(int x, int y)

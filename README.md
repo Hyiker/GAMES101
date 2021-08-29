@@ -16,3 +16,11 @@ Rasterization and Antialiasing.
 
 Antialiasing off
 
+[![hGG2WQ.png](https://z3.ax1x.com/2021/08/29/hGG2WQ.png)](https://imgtu.com/i/hGG2WQ)
+
+Antialiasing on
+
+## Assignment3
+
+TODO
+

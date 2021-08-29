@@ -79,7 +79,8 @@ class rasterizer
     std::map<int, std::vector<Eigen::Vector3i>> ind_buf;
 
     std::vector<Eigen::Vector3f> frame_buf;
-    std::vector<float> depth_buf;
+    std::vector<std::array<float, 4>> depth_buf;
+    std::vector<std::array<float, 4>> color_buffer;
     int get_index(int x, int y);
 
     int width, height;

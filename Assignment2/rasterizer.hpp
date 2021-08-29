@@ -92,7 +92,10 @@ namespace rst
 
         std::vector<Eigen::Vector3f> frame_buf;
 
-        std::vector<float> depth_buf;
+        std::vector<std::array<float, 4>> depth_buf;
+        // we **must** use a color buffer instead of directly calc
+        // the average of the sum to avoid black border
+        std::vector<std::array<Eigen::Vector3f, 4>> color_buf;
         int get_index(int x, int y);
 
         int width, height;

@@ -9,6 +9,8 @@
 #include <opencv2/opencv.hpp>
 #include <math.h>
 
+using std::min;
+using std::max;
 
 rst::pos_buf_id rst::rasterizer::load_positions(const std::vector<Eigen::Vector3f> &positions)
 {
@@ -39,10 +41,21 @@ auto to_vec4(const Eigen::Vector3f& v3, float w = 1.0f)
     return Vector4f(v3.x(), v3.y(), v3.z(), w);
 }
 
+static inline float cross(float x, float y, Vector3f vertex){
+  Vector3f edge(x, y, 0);
+  vertex[2] = 0;
+  return edge.cross(vertex).z();
+}
 
 static bool insideTriangle(int x, int y, const Vector3f* _v)
 {   
     // TODO : Implement this function to check if the point (x, y) is inside the triangle represented by _v[0], _v[1], _v[2]
+    float cross_res[3];
+    for(int i = 0; i < 3; i++){
+      cross_res[i] = cross(x - _v[i].x(), y - _v[i].y(), _v[i] - _v[(i+1)%3]);
+    }
+    return (cross_res[0] < 0 && cross_res[1] < 0 && cross_res[2] < 0) || 
+      (cross_res[0] > 0 && cross_res[1] > 0 && cross_res[2] > 0);
 }
 
 static std::tuple<float, float, float> computeBarycentric2D(float x, float y, const Vector3f* v)
@@ -102,18 +115,35 @@ void rst::rasterizer::draw(pos_buf_id pos_buffer, ind_buf_id ind_buffer, col_buf
     }
 }
 
+
 //Screen space rasterization
 void rst::rasterizer::rasterize_triangle(const Triangle& t) {
     auto v = t.toVector4();
     
     // TODO : Find out the bounding box of current triangle.
     // iterate through the pixel and find if the current pixel is inside the triangle
+    // top-left right-bottom
+    Vector2f bound_box[2] = {
+      {min(min(v[0].x(), v[1].x()), v[2].x()), min(min(v[0].y(), v[1].y()), v[2].y())},
+      {max(max(v[0].x(), v[1].x()), v[2].x()), max(max(v[0].y(), v[1].y()), v[2].y())}
+    };
 
     // If so, use the following code to get the interpolated z value.
-    //auto[alpha, beta, gamma] = computeBarycentric2D(x, y, t.v);
-    //float w_reciprocal = 1.0/(alpha / v[0].w() + beta / v[1].w() + gamma / v[2].w());
-    //float z_interpolated = alpha * v[0].z() / v[0].w() + beta * v[1].z() / v[1].w() + gamma * v[2].z() / v[2].w();
-    //z_interpolated *= w_reciprocal;
+    for(int x = bound_box[0].x(); x < bound_box[1].x(); x++){
+        for(int y = bound_box[0].y(); y < bound_box[1].y(); y++){
+          auto[alpha, beta, gamma] = computeBarycentric2D(x, y, t.v);
+          float w_reciprocal = 1.0/(alpha / v[0].w() + beta / v[1].w() + gamma / v[2].w());
+          float z_interpolated = alpha * v[0].z() / v[0].w() + beta * v[1].z() / v[1].w() + gamma * v[2].z() / v[2].w();
+          z_interpolated *= w_reciprocal;
+          if(insideTriangle(x, y, t.v)){
+            auto ind = (height-1-y)*width + x;
+            if(z_interpolated < depth_buf[ind]){
+              set_pixel(Vector3f(x, y, 0), t.getColor());
+              depth_buf[ind] = z_interpolated;
+            }
+          }
+        }
+    }
 
     // TODO : set the current pixel (use the set_pixel function) to the color of the triangle (use getColor function) if it should be painted.
 }

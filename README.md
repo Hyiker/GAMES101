@@ -8,3 +8,11 @@ Rotation and Projection.
 
 [![h8G3n0.md.png](https://z3.ax1x.com/2021/08/29/h8G3n0.md.png)](https://imgtu.com/i/h8G3n0)
 
+## Assignment2
+
+Rasterization and Antialiasing.
+
+[![hGiwKs.png](https://z3.ax1x.com/2021/08/29/hGiwKs.png)](https://imgtu.com/i/hGiwKs)
+
+Antialiasing off
+

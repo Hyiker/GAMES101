@@ -22,5 +22,7 @@ Antialiasing on
 
 ## Assignment3
 
-TODO
+[![htHuDS.png](https://z3.ax1x.com/2021/08/30/htHuDS.png)](https://imgtu.com/i/htHuDS)
+
+Normal shader
 

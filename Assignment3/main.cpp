@@ -7,6 +7,7 @@
 #include "Shader.hpp"
 #include "Texture.hpp"
 #include "OBJ_Loader.h"
+#include <cmath>
 
 Eigen::Matrix4f get_view_matrix(Eigen::Vector3f eye_pos)
 {
@@ -148,12 +149,28 @@ Eigen::Vector3f phong_fragment_shader(const fragment_shader_payload& payload)
     Eigen::Vector3f point = payload.view_pos;
     Eigen::Vector3f normal = payload.normal;
 
+//  struct light
+//  {
+//      Eigen::Vector3f position;
+//      Eigen::Vector3f intensity;
+//  };
     Eigen::Vector3f result_color = {0, 0, 0};
     for (auto& light : lights)
     {
         // TODO: For each light source in the code, calculate what the *ambient*, *diffuse*, and *specular* 
         // components are. Then, accumulate that result on the *result_color* object.
-        
+        // L = La + Ld + Ls
+        // = kaIa + kd(I/r^2)max(0, nl) + ks(I/r^2)max(0, nh)^p
+        // h -> halfway vector
+        float dist_sq = (light.position - point).squaredNorm();
+        auto light_vec = (light.position - point).normalized();
+        auto view_vec = (eye_pos - point).normalized();
+        auto hw_vec = (view_vec + light_vec) / (view_vec + light_vec).norm();
+        auto light_indensity = light.intensity / dist_sq;
+        Eigen::Vector3f ambient = ka.cwiseProduct(amb_light_intensity);
+        Eigen::Vector3f diffuse = kd.cwiseProduct(light_indensity) * std::max(0.0f, (float)(normal.dot(light_vec.normalized())));
+        Eigen::Vector3f specular = ks.cwiseProduct(light_indensity) * std::pow(std::max(0.0f, (float)(normal.dot(hw_vec))), p);
+        result_color += ambient + diffuse + specular;
     }
 
     return result_color * 255.f;

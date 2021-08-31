@@ -26,3 +26,11 @@ Antialiasing on
 
 Normal shader
 
+[![haRTaR.md.png](https://z3.ax1x.com/2021/08/31/haRTaR.md.png)](https://imgtu.com/i/haRTaR)
+
+Phong Shader
+
+[![haR7I1.md.png](https://z3.ax1x.com/2021/08/31/haR7I1.md.png)](https://imgtu.com/i/haR7I1)
+
+Texture Shader
+

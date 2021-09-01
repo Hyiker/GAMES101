@@ -34,3 +34,11 @@ Phong Shader
 
 Texture Shader
 
+[![hw17XF.md.png](https://z3.ax1x.com/2021/09/01/hw17XF.md.png)](https://imgtu.com/i/hw17XF)
+
+Bump Shader
+
+[![hw1T6U.md.png](https://z3.ax1x.com/2021/09/01/hw1T6U.md.png)](https://imgtu.com/i/hw1T6U)
+
+Displacement Shader
+

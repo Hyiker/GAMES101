@@ -222,7 +222,8 @@ displacement_fragment_shader(const fragment_shader_payload &payload) {
   mat.col(1) = b;
   mat.col(2) = n;
   auto uv = payload.texture->getColor(u, v);
-  // we must limit (u+1/w) and (v+1/h) to be in the range(0, 1), otherwise there would be segmentfault
+  // we must limit (u+1/w) and (v+1/h) to be in the range(0, 1), otherwise there
+  // would be segmentfault
   float du =
       kh * kn *
       (payload.texture->getColor(std::min(u + 1.0f / w, 1.0f), v).norm() -
@@ -243,7 +244,7 @@ displacement_fragment_shader(const fragment_shader_payload &payload) {
     float dist_sq = (light.position - point).squaredNorm();
     auto light_vec = (light.position - point).normalized();
     auto view_vec = (eye_pos - point).normalized();
-    auto hw_vec = (view_vec + light_vec) / (view_vec + light_vec).norm();
+    auto hw_vec = (view_vec + light_vec).normalized();
     auto light_indensity = light.intensity / dist_sq;
     Eigen::Vector3f ambient = ka.cwiseProduct(amb_light_intensity);
     Eigen::Vector3f diffuse =
@@ -290,7 +291,8 @@ Eigen::Vector3f bump_fragment_shader(const fragment_shader_payload &payload) {
   mat.col(0) = t;
   mat.col(1) = b;
   mat.col(2) = n;
-  // we must limit (u+1/w) and (v+1/h) to be in the range(0, 1), otherwise there would be segmentfault
+  // we must limit (u+1/w) and (v+1/h) to be in the range(0, 1), otherwise there
+  // would be segmentfault
   float du =
       kh * kn *
       (payload.texture->getColor(std::min(u + 1.0f / w, 1.0f), v).norm() -

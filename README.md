@@ -42,3 +42,9 @@ Bump Shader
 
 Displacement Shader
 
+## Assignment4
+
+[![h2EqPA.md.png](https://z3.ax1x.com/2021/09/04/h2EqPA.md.png)](https://imgtu.com/i/h2EqPA)
+
+Antialiasing off
+

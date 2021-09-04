@@ -43,12 +43,23 @@ cv::Point2f recursive_bezier(const std::vector<cv::Point2f> &control_points,
     return recursive_bezier(cpc, t);
 }
 
+void antialiasing_fill(const cv::Point2f &p, cv::Mat &window, int n = 1) {
+  int x0 = p.x - n / 2, y0 = p.y - n / 2;
+  for (int x = x0; x <= x0 + n; x++) {
+    for (int y = y0; y <= y0 + n; y++) {
+      float xf = x, yf = y;
+      window.at<cv::Vec3b>(y, x)[1] = 255;
+    }
+  }
+}
+
 void bezier(const std::vector<cv::Point2f> &control_points, cv::Mat &window) {
   // TODO: Iterate through all t = 0 to t = 1 with small steps, and call de
   // Casteljau's
   for (double t = 0; t <= 1.0; t += 0.001) {
     auto point = recursive_bezier(control_points, t);
-    window.at<cv::Vec3b>(point.y, point.x)[1] = 255;
+    // calculate the distance to decide the color visibility
+    antialiasing_fill(point, window, 0);
   }
   // recursive Bezier algorithm.
 }
@@ -73,8 +84,8 @@ int main() {
     }
 
     if (control_points.size() == 4) {
-      naive_bezier(control_points, window);
-      //   bezier(control_points, window);
+      //      naive_bezier(control_points, window);
+      bezier(control_points, window);
 
       cv::imshow("Bezier Curve", window);
       cv::imwrite("my_bezier_curve.png", window);

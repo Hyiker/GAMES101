@@ -22,6 +22,8 @@ Antialiasing on
 
 ## Assignment3
 
+Texture shading and normal shading.
+
 [![htHuDS.png](https://z3.ax1x.com/2021/08/30/htHuDS.png)](https://imgtu.com/i/htHuDS)
 
 Normal shader
@@ -44,6 +46,8 @@ Displacement Shader
 
 ## Assignment4
 
+Bezier Curve
+
 [![h2K6Lq.md.png](https://z3.ax1x.com/2021/09/04/h2K6Lq.md.png)](https://imgtu.com/i/h2K6Lq)
 
 Antialiasing off
@@ -51,4 +55,10 @@ Antialiasing off
 [![hHuk11.md.png](https://z3.ax1x.com/2021/09/08/hHuk11.md.png)](https://imgtu.com/i/hHuk11)
 
 Antialiasing on
+
+## Assignment5
+
+Raytracing
+
+[![hbpZQJ.md.png](https://z3.ax1x.com/2021/09/08/hbpZQJ.md.png)](https://imgtu.com/i/hbpZQJ)
 

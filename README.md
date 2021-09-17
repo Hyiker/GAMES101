@@ -68,6 +68,11 @@ Raytracing Acceleration
 
 [![4K3Dfg.md.png](https://z3.ax1x.com/2021/09/17/4K3Dfg.md.png)](https://imgtu.com/i/4K3Dfg)
 
-**BVH** Implementation
+**Naive** Implementation
 
 Time Cost: `6min 51sec`
+
+
+**BVH** Implementation
+
+Time Cost: `5sec`

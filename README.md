@@ -76,3 +76,8 @@ Time Cost: `6min 51sec`
 **BVH** Implementation
 
 Time Cost: `5sec`
+
+
+**SAH** Implementation
+
+Time Cost: `5sec`

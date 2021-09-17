@@ -70,7 +70,37 @@ BVHBuildNode* BVHAccel::recursiveBuild(std::vector<Object*> objects) {
     }
 
     auto beginning = objects.begin();
-    auto middling = objects.begin() + (objects.size() / 2);
+    std::vector<Object*>::iterator middling;
+    if (splitMethod == SplitMethod::NAIVE) {
+      middling = objects.begin() + (objects.size() / 2);
+    } else {
+      int s = 0;
+      float cost_min = 1.0 / 0.0;
+      for (int i = 1; i < objects.size(); i++) {
+        // split objects[i] into the left collection.
+        auto obj_bd = objects[i]->getBounds();
+        float cost;
+        switch (dim) {
+          case 0:
+            cost = i * (obj_bd.pMin.x - bounds.pMin.x) +
+                   (objects.size() - i) * (bounds.pMax.x - obj_bd.pMin.x);
+            break;
+          case 1:
+            cost = i * (obj_bd.pMin.y - bounds.pMin.y) +
+                   (objects.size() - i) * (bounds.pMax.y - obj_bd.pMin.y);
+            break;
+          case 2:
+            cost = i * (obj_bd.pMin.z - bounds.pMin.z) +
+                   (objects.size() - i) * (bounds.pMax.z - obj_bd.pMin.z);
+            break;
+        }
+        if (cost < cost_min) {
+          s = i;
+          cost_min = cost;
+        }
+      }
+      middling = objects.begin() + s;
+    }
     auto ending = objects.end();
 
     auto leftshapes = std::vector<Object*>(beginning, middling);

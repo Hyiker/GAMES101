@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "*.html": "html",
+        "*.py": "python",
+        "*.tcc": "cpp",
+        "algorithm": "cpp",
+        "iterator": "cpp",
+        "random": "cpp",
+        "functional": "cpp",
+        "fstream": "cpp",
+        "memory": "cpp"
+    }
+}

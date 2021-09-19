@@ -4,6 +4,10 @@
 
 #include "Scene.hpp"
 
+#include <limits>
+
+constexpr float epsilon = std::numeric_limits<float>::epsilon();
+
 void Scene::buildBVH() {
   printf(" - Generating BVH...\n\n");
   this->bvh = new BVHAccel(objects, 1, BVHAccel::SplitMethod::NAIVE);
@@ -57,33 +61,40 @@ Vector3f Scene::castRay(const Ray &ray, int depth) const {
   // TODO Implement Path Tracing Algorithm here
   Intersection p = intersect(ray);
   if (!p.happened) {
-    return Vector3f();
+    return {};
   }
 
-  Intersection inter;
-  float pdf_l;
-  sampleLight(inter, pdf_l);
+  if (p.m->hasEmission()) {
+    return p.m->getEmission();
+  }
 
-  Vector3f l_dir(0, 0, 0);
-  Vector3f wo = ray.direction, ws = inter.coords - p.coords;
-  if (!intersect(Ray(p.coords, (inter.coords - p.coords).normalized()))
-           .happened) {
-    l_dir = p.emit * p.m->eval(wo, ws, p.normal) * dotProduct(ws, p.normal) *
-            dotProduct(ws, inter.normal) /
-            pow((inter.coords - p.coords).norm(), 2) / pdf_l;
+  Intersection l_inter;
+  float pdf_l = 0.0;
+  sampleLight(l_inter, pdf_l);
+
+  Vector3f l_dir(0, 0, 0), l_indir(0, 0, 0);
+  Vector3f ws = l_inter.coords - p.coords;
+  Intersection inter = intersect(Ray(p.coords, ws.normalized()));
+  if (inter.distance - ws.norm() > -EPSILON) {
+    // the ray hasn't been shielded by object on the way
+    Vector3f emit = l_inter.emit,
+             f_r = p.m->eval(ray.direction, ws.normalized(), p.normal);
+    float cos_theta = dotProduct(ws.normalized(), p.normal),
+          cos_theta_x = dotProduct(-ws.normalized(), l_inter.normal);
+    l_dir = emit * f_r * cos_theta * cos_theta_x / pow(ws.norm(), 2) / pdf_l;
   }
 
   if (dist(gen) > RussianRoulette) {
-    return Vector3f();
+    return l_dir;
   }
-  auto wi = p.m->sample(wo, p.normal);
-  Ray r(p.coords, (wi - p.coords).normalized());
-  Intersection indir_inter = intersect(r);
-  Vector3f l_indir(0, 0, 0);
-  if (indir_inter.happened && !indir_inter.m->hasEmission()) {
-    l_indir = castRay(r, depth) * p.m->eval(wo, wi, p.normal) *
-              dotProduct(wi, p.normal) / p.m->pdf(wo, wi, p.normal) /
+  auto wi = p.m->sample(ray.direction, p.normal);
+  Ray r(p.coords, wi.normalized());
+  auto rec = castRay(r, depth);
+  Intersection inn = intersect(r);
+  if (inn.happened && !inn.m->hasEmission())
+    l_indir = rec * p.m->eval(ray.direction, wi.normalized(), p.normal) *
+              dotProduct(wi.normalized(), p.normal) /
+              p.m->pdf(ray.direction, wi.normalized(), p.normal) /
               RussianRoulette;
-  }
   return l_dir + l_indir;
 }

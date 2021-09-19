@@ -97,7 +97,7 @@ inline bool Bounds3::IntersectP(const Ray& ray, const Vector3f& invDir,
   // the earliest exit axis time
   float t_exit = fmin(t_out.x, fmin(t_out.y, t_out.z));
 
-  return t_enter < t_exit && t_exit >= 0.0;
+  return t_enter <= t_exit && t_exit >= 0.0;
 }
 
 inline Bounds3 Union(const Bounds3& b1, const Bounds3& b2) {

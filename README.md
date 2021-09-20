@@ -81,3 +81,9 @@ Time Cost: `5sec`
 **SAH** Implementation
 
 Time Cost: `5sec`
+
+## Assignment7
+
+[![4JEPyR.png](https://z3.ax1x.com/2021/09/20/4JEPyR.png)](https://imgtu.com/i/4JEPyR)
+
+spp: 200, 512x512

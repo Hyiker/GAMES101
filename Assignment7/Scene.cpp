@@ -56,15 +56,16 @@ bool Scene::trace(const Ray &ray, const std::vector<Object *> &objects,
 
 std::default_random_engine gen;
 std::uniform_real_distribution<double> dist(0.0, 1.0);
+constexpr float epsilon_light = 1e-4;
 // Implementation of Path Tracing
 Vector3f Scene::castRay(const Ray &ray, int depth) const {
   // TODO Implement Path Tracing Algorithm here
   Intersection p = intersect(ray);
   if (!p.happened) {
-    return {};
+    return Vector3f();
   }
 
-  if (p.m->hasEmission()) {
+  if (p.m->hasEmission() && depth == 0) {
     return p.m->getEmission();
   }
 
@@ -75,26 +76,26 @@ Vector3f Scene::castRay(const Ray &ray, int depth) const {
   Vector3f l_dir(0, 0, 0), l_indir(0, 0, 0);
   Vector3f ws = l_inter.coords - p.coords;
   Intersection inter = intersect(Ray(p.coords, ws.normalized()));
-  if (inter.distance - ws.norm() > -EPSILON) {
+  if (inter.distance - ws.norm() > -epsilon_light) {
     // the ray hasn't been shielded by object on the way
     Vector3f emit = l_inter.emit,
-             f_r = p.m->eval(ray.direction, ws.normalized(), p.normal);
+             f_r = p.m->eval(ray.direction, ws, p.normal);
     float cos_theta = dotProduct(ws.normalized(), p.normal),
           cos_theta_x = dotProduct(-ws.normalized(), l_inter.normal);
-    l_dir = emit * f_r * cos_theta * cos_theta_x / pow(ws.norm(), 2) / pdf_l;
+    l_dir = emit * f_r * cos_theta * cos_theta_x / (ws.x * ws.x + ws.y * ws.y + ws.z * ws.z) / pdf_l;
   }
 
   if (dist(gen) > RussianRoulette) {
     return l_dir;
   }
-  auto wi = p.m->sample(ray.direction, p.normal);
-  Ray r(p.coords, wi.normalized());
-  auto rec = castRay(r, depth);
+  auto wi = p.m->sample(ray.direction, p.normal).normalized();
+  Ray r(p.coords, wi);
+  auto rec = castRay(r, depth + 1);
   Intersection inn = intersect(r);
-  if (inn.happened && !inn.m->hasEmission())
-    l_indir = rec * p.m->eval(ray.direction, wi.normalized(), p.normal) *
-              dotProduct(wi.normalized(), p.normal) /
-              p.m->pdf(ray.direction, wi.normalized(), p.normal) /
-              RussianRoulette;
+  if (inn.happened && !inn.m->hasEmission()) {
+    float pdf = p.m->pdf(ray.direction, wi, p.normal);
+    l_indir = rec * p.m->eval(ray.direction, wi, p.normal) *
+              dotProduct(wi, p.normal) / pdf / RussianRoulette;
+  }
   return l_dir + l_indir;
 }

@@ -2,6 +2,7 @@
 // Created by goksu on 2/25/20.
 //
 #include "Scene.hpp"
+#include "ThreadPool.h"
 
 #pragma once
 struct hit_payload
@@ -18,4 +19,5 @@ public:
     void Render(const Scene& scene);
 
 private:
+    ThreadPool pool = ThreadPool(12);
 };

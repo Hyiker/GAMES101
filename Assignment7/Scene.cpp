@@ -79,7 +79,7 @@ Vector3f Scene::castRay(const Ray &ray, int depth) const {
   if (inter.distance - ws.norm() > -epsilon_light) {
     // the ray hasn't been shielded by object on the way
     Vector3f emit = l_inter.emit,
-             f_r = p.m->eval(ray.direction, ws, p.normal);
+             f_r = p.m->eval(-ray.direction, normalize(ws), p.normal);
     float cos_theta = dotProduct(ws.normalized(), p.normal),
           cos_theta_x = dotProduct(-ws.normalized(), l_inter.normal);
     l_dir = emit * f_r * cos_theta * cos_theta_x / (ws.x * ws.x + ws.y * ws.y + ws.z * ws.z) / pdf_l;
@@ -94,7 +94,7 @@ Vector3f Scene::castRay(const Ray &ray, int depth) const {
   Intersection inn = intersect(r);
   if (inn.happened && !inn.m->hasEmission()) {
     float pdf = p.m->pdf(ray.direction, wi, p.normal);
-    l_indir = rec * p.m->eval(ray.direction, wi, p.normal) *
+    l_indir = rec * p.m->eval(-ray.direction, wi, p.normal) *
               dotProduct(wi, p.normal) / pdf / RussianRoulette;
   }
   return l_dir + l_indir;

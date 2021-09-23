@@ -91,3 +91,7 @@ spp: 200, 512x512
 [![40GG0s.png](https://z3.ax1x.com/2021/09/23/40GG0s.png)](https://imgtu.com/i/40GG0s)
 
 spp: 24, 512x512. Microfacet with diffuse
+
+[![405f8x.png](https://z3.ax1x.com/2021/09/24/405f8x.png)](https://imgtu.com/i/405f8x)
+
+spp: 200, 512x512

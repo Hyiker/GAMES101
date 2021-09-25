@@ -23,16 +23,16 @@ void Application::init() {
 
   glColor3f(1.0, 1.0, 1.0);
   // Create two ropes 
-  ropeEuler = new Rope(Vector2D(0, 200), Vector2D(-400, 200), 3, config.mass,
+  ropeEuler = new Rope(Vector2D(0, 200), Vector2D(-400, 200), 16, config.mass,
                        config.ks, {0});
-  ropeVerlet = new Rope(Vector2D(0, 200), Vector2D(-400, 200), 3, config.mass,
+  ropeVerlet = new Rope(Vector2D(0, 200), Vector2D(-400, 200), 16, config.mass,
                         config.ks, {0});
 }
 
 void Application::render() {
   //Simulation loops
   for (int i = 0; i < config.steps_per_frame; i++) {
-    ropeEuler->simulateEuler(1 / config.steps_per_frame, config.gravity);
+    // ropeEuler->simulateEuler(1 / config.steps_per_frame, config.gravity);
     ropeVerlet->simulateVerlet(1 / config.steps_per_frame, config.gravity);
   }
   // Rendering ropes

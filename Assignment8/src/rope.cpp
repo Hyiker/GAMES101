@@ -9,6 +9,7 @@
 
 namespace CGL {
 
+constexpr float damping_factor = 0.00005f;
 Rope::Rope(Vector2D start, Vector2D end, int num_nodes, float node_mass,
            float k, vector<int> pinned_nodes) {
   // TODO (Part 1): Create a rope starting at `start`, ending at `end`, and
@@ -73,8 +74,8 @@ void Rope::simulateVerlet(float delta_t, Vector2D gravity) {
       Vector2D temp_position = m->position;
       // TODO (Part 3.1): Set the new position of the rope mass
       m->forces += gravity * m->mass;
-      m->position = 2 * m->position - m->last_position +
-                    m->forces / m->mass * delta_t * delta_t;
+      m->position += (1 - damping_factor) * (m->position - m->last_position) +
+                     m->forces / m->mass * delta_t * delta_t;
 
       m->last_position = temp_position;
       // TODO (Part 4): Add global Verlet damping

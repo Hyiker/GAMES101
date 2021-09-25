@@ -32,7 +32,7 @@ void Application::init() {
 void Application::render() {
   //Simulation loops
   for (int i = 0; i < config.steps_per_frame; i++) {
-    // ropeEuler->simulateEuler(1 / config.steps_per_frame, config.gravity);
+    ropeEuler->simulateEuler(1 / config.steps_per_frame, config.gravity);
     ropeVerlet->simulateVerlet(1 / config.steps_per_frame, config.gravity);
   }
   // Rendering ropes

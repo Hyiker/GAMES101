@@ -95,3 +95,7 @@ spp: 24, 512x512. Microfacet with diffuse
 [![405f8x.png](https://z3.ax1x.com/2021/09/24/405f8x.png)](https://imgtu.com/i/405f8x)
 
 spp: 200, 512x512
+
+## Assignment8
+
+[![4sHdH0.md.png](https://z3.ax1x.com/2021/09/25/4sHdH0.md.png)](https://imgtu.com/i/4sHdH0)
